@@ -1,0 +1,336 @@
+<%@ page contentType="text/html;charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ page import="util.DisplayUtil" %>
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <%@ include file="/WEB-INF/views/common/head.jsp" %>
+    <title>Quản Lý Hóa Đơn - PolyBuilding Kế Toán</title>
+
+    <style>
+:root {
+            --bg-primary: #1E3B34;
+            --bg-accent: #B98A46;
+            --bg-cream: #F4EFE4;
+            --text-dark: #2C3E50;
+        }
+        body {
+            background-color: var(--bg-cream);
+            color: var(--text-dark);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card-custom {
+            background-color: white;
+            border-radius: 12px;
+            border: none;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+        .stat-card {
+            border-radius: 12px;
+            padding: 18px;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            min-height: 100px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+        }
+        .stat-card .number {
+            font-size: 1.6rem;
+            font-weight: 700;
+        }
+        .stat-card .label {
+            font-size: 0.85rem;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .table-custom th {
+            background-color: #f8f9fa;
+            color: var(--bg-primary);
+            font-weight: 600;
+        }
+        .btn-gold {
+            background-color: var(--bg-accent);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+        .btn-gold:hover {
+            background-color: #a07639;
+            color: white;
+        }
+        .btn-success {
+            background-color: var(--bg-primary);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+        .btn-success:hover {
+            background-color: #152b26;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout-wrapper">
+    <jsp:include page="/WEB-INF/views/ketoan/common/sidebar.jsp" />
+
+    <div class="main-content">
+        <jsp:include page="/WEB-INF/views/ketoan/common/header.jsp" />
+
+        <c:if test="${not empty param.msg}">
+            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                ✅ <c:out value="${param.msg}" />
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </c:if>
+
+        <c:if test="${not empty param.error}">
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                ❌ <c:out value="${param.error}" />
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        </c:if>
+
+        <!-- Thẻ Thống Kê -->
+        <div class="row g-3 mb-4">
+            <div class="col-md-3">
+                <div class="stat-card" style="background: linear-gradient(135deg, #1E3B34, #2d584e);">
+                    <span class="label">📄 Tổng Số Hóa Đơn</span>
+                    <span class="number">${stats.soHoaDon}</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="background: linear-gradient(135deg, #0288d1, #03a9f4);">
+                    <span class="label">💰 Tổng Phải Thu</span>
+                    <span class="number">${DisplayUtil.formatTien(stats.tongPhaiThu)}</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="background: linear-gradient(135deg, #2e7d32, #4caf50);">
+                    <span class="label">✅ Đã Thanh Toán</span>
+                    <span class="number">${DisplayUtil.formatTien(stats.tongDaThu)}</span>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card" style="background: linear-gradient(135deg, #c62828, #e53935);">
+                    <span class="label">⚠️ Còn Nợ</span>
+                    <span class="number">${DisplayUtil.formatTien(stats.tongConNo)}</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Khung Xuất Hóa Đơn Hàng Loạt -->
+        <div class="card-custom border-start border-4 border-warning">
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div>
+                    <h5 class="fw-bold text-dark m-0">⚡ Xuất Hóa Đơn Hàng Loạt Cho Tất Cả Căn Hộ</h5>
+                    <small class="text-muted">Hệ thống sẽ tự động tính Điện, Nước, Phí quản lý, Gửi xe & Tiện ích</small>
+                </div>
+                <form action="${pageContext.request.contextPath}/ketoan/hoa-don/xuat" method="post"
+                      class="d-flex align-items-center gap-2"
+                      onsubmit="return confirm('Bạn có chắc chắn muốn xuất hóa đơn hàng loạt cho kỳ được chọn?');">
+                    <select name="thang" class="form-select w-auto">
+                        <c:forEach var="m" begin="1" end="12">
+                            <option value="${m}" ${m == (thang != null ? thang : 7) ? 'selected' : ''}>Tháng ${m}</option>
+                        </c:forEach>
+                    </select>
+                    <select name="nam" class="form-select w-auto">
+                        <c:forEach var="y" begin="2025" end="2027">
+                            <option value="${y}" ${y == (nam != null ? nam : 2026) ? 'selected' : ''}>Năm ${y}</option>
+                        </c:forEach>
+                    </select>
+                    <button type="submit" class="btn btn-gold text-nowrap me-2">
+                        🚀 Xuất Hóa Đơn
+                    </button>
+                    <button type="button" class="btn btn-danger text-nowrap fw-bold" data-bs-toggle="modal" data-bs-target="#modalNhacPhi">
+                        📩 Gửi Nhắc Phí
+                    </button>
+                </form>
+            </div>
+        </div>
+
+        <!-- Modal Xác Nhận Gửi Nhắc Phí -->
+        <div class="modal fade" id="modalNhacPhi" tabindex="-1">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <form action="${pageContext.request.contextPath}/ketoan/hoa-don/nhac-phi" method="post">
+                        <div class="modal-header bg-danger text-white">
+                            <h5 class="modal-title fw-bold text-white">📩 Xác Nhận Gửi Thông Báo Nhắc Phí</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p class="mb-2 text-dark">Hệ thống sẽ tự động tạo và gửi thông báo nhắc phí đến tài khoản cư dân của <strong>tất cả các căn hộ còn nợ phí</strong> trong kỳ thu phí dưới đây:</p>
+                            <div class="row g-2 mb-3 align-items-center bg-light p-2 rounded border">
+                                <div class="col-auto"><strong>Chọn kỳ nhắc phí:</strong></div>
+                                <div class="col-auto">
+                                    <select name="thang" class="form-select form-select-sm">
+                                        <c:forEach var="m" begin="1" end="12">
+                                            <option value="${m}" ${m == currentThang ? 'selected' : ''}>Tháng ${m}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                                <div class="col-auto">
+                                    <select name="nam" class="form-select form-select-sm">
+                                        <c:forEach var="y" begin="2025" end="2027">
+                                            <option value="${y}" ${y == currentNam ? 'selected' : ''}>Năm ${y}</option>
+                                        </c:forEach>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <h6 class="fw-bold text-danger mb-2">📋 Danh Sách Xem Trước Các Căn Hộ Sẽ Nhận Nhắc Phí:</h6>
+                            <div class="table-responsive" style="max-height: 250px; overflow-y: auto;">
+                                <table class="table table-sm table-bordered align-middle m-0">
+                                    <thead class="table-secondary">
+                                        <tr>
+                                            <th>Căn Hộ</th>
+                                            <th>Chủ Hộ</th>
+                                            <th class="text-end">Tổng Tiền HĐ</th>
+                                            <th class="text-end">Đã Thanh Toán</th>
+                                            <th class="text-end">Còn Nợ Phải Gửi</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <c:choose>
+                                            <c:when test="${not empty dsConNo}">
+                                                <c:forEach var="r" items="${dsConNo}">
+                                                    <tr>
+                                                        <td class="fw-bold text-primary">Căn ${r[1]}</td>
+                                                        <td>${r[2]}</td>
+                                                        <td class="text-end">${DisplayUtil.formatTienDouble(r[3])}</td>
+                                                        <td class="text-end text-success">${DisplayUtil.formatTienDouble(r[4])}</td>
+                                                        <td class="text-end fw-bold text-danger">${DisplayUtil.formatTienDouble(r[5])}</td>
+                                                    </tr>
+                                                </c:forEach>
+                                            </c:when>
+                                            <c:otherwise>
+                                                <tr>
+                                                    <td colspan="5" class="text-center text-muted py-3">Hiện không có căn hộ nào còn nợ phí trong kỳ này.</td>
+                                                </tr>
+                                            </c:otherwise>
+                                        </c:choose>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <small class="text-muted mt-2 d-block">* Các căn hộ đã nhận thông báo nhắc phí cho kỳ này trong vòng 7 ngày gần nhất sẽ tự động được bỏ qua để tránh gửi lặp lại.</small>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                            <button type="submit" class="btn btn-danger fw-bold">🚀 Xác Nhận Gửi Nhắc Phí</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bộ Lọc Danh Sách Hóa Đơn -->
+        <div class="card-custom">
+            <form action="${pageContext.request.contextPath}/ketoan/hoa-don" method="get" class="row g-3 align-items-center">
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Tháng kỳ hóa đơn:</label>
+                    <select name="thang" class="form-select">
+                        <option value="ALL">-- Tất cả tháng --</option>
+                        <c:forEach var="m" begin="1" end="12">
+                            <option value="${m}" ${m == thang ? 'selected' : ''}>Tháng ${m}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Năm kỳ hóa đơn:</label>
+                    <select name="nam" class="form-select">
+                        <option value="ALL">-- Tất cả năm --</option>
+                        <c:forEach var="y" begin="2025" end="2027">
+                            <option value="${y}" ${y == nam ? 'selected' : ''}>Năm ${y}</option>
+                        </c:forEach>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <label class="form-label fw-semibold">Trạng thái thanh toán:</label>
+                    <select name="trangThai" class="form-select">
+                        <option value="ALL" ${'ALL' == trangThai ? 'selected' : ''}>-- Tất cả trạng thái --</option>
+                        <option value="ChuaThanhToan" ${'ChuaThanhToan' == trangThai ? 'selected' : ''}>Chưa thanh toán</option>
+                        <option value="DaThanhToan" ${'DaThanhToan' == trangThai ? 'selected' : ''}>Đã thanh toán</option>
+                        <option value="QuaHan" ${'QuaHan' == trangThai ? 'selected' : ''}>Quá hạn</option>
+                    </select>
+                </div>
+                <div class="col-md-3 d-flex align-items-end">
+                    <button type="submit" class="btn btn-success w-100 py-2">
+                        🔍 Lọc Danh Sách
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Bảng Danh Sách Hóa Đơn -->
+        <div class="card-custom">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h5 class="fw-bold m-0" style="color: var(--bg-primary);">
+                    🧾 Danh Sách Hóa Đơn Chung Cư
+                </h5>
+                <span class="badge bg-secondary">Tìm thấy: ${hoaDonList != null ? hoaDonList.size() : 0} hóa đơn</span>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-hover table-bordered table-custom">
+                    <thead>
+                    <tr>
+                        <th class="text-center">Mã HĐ</th>
+                        <th class="text-center">Số Phòng</th>
+                        <th>Chủ Hộ</th>
+                        <th class="text-center">Kỳ Hóa Đơn</th>
+                        <th class="text-end">Tổng Tiền</th>
+                        <th class="text-center">Trạng Thái</th>
+                        <th class="text-center">Thao Tác</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <c:choose>
+                        <c:when test="${not empty hoaDonList}">
+                            <c:forEach var="row" items="${hoaDonList}">
+                                <tr>
+                                    <td class="text-center fw-bold">#<c:out value="${row[0]}" /></td>
+                                    <td class="text-center fw-bold text-primary"><c:out value="${row[1]}" /></td>
+                                    <td>
+                                        <c:choose>
+                                            <c:when test="${not empty row[2]}"><c:out value="${row[2]}" /></c:when>
+                                            <c:otherwise><span class="text-muted"><i>(Chưa xác định)</i></span></c:otherwise>
+                                        </c:choose>
+                                    </td>
+                                    <td class="text-center">Tháng <c:out value="${row[3]}" />/<c:out value="${row[4]}" /></td>
+                                    <td class="text-end fw-bold text-success">
+                                        ${DisplayUtil.formatTien(row[5])}
+                                    </td>
+                                    <td class="text-center">
+                                        <span class="badge ${DisplayUtil.getTrangThaiThanhToanBadgeClass(row[6])}">
+                                            ${DisplayUtil.getTrangThaiThanhToanText(row[6])}
+                                        </span>
+                                    </td>
+                                    <td class="text-center">
+                                        <a href="${pageContext.request.contextPath}/ketoan/hoa-don/chi-tiet?id=${row[0]}" class="btn btn-sm btn-outline-primary">
+                                            👁️ Xem Chi Tiết
+                                        </a>
+                                    </td>
+                                </tr>
+                            </c:forEach>
+                        </c:when>
+                        <c:otherwise>
+                            <tr>
+                                <td colspan="7" class="text-center text-muted py-4">Không tìm thấy hóa đơn nào khớp với bộ lọc.</td>
+                            </tr>
+                        </c:otherwise>
+                    </c:choose>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
