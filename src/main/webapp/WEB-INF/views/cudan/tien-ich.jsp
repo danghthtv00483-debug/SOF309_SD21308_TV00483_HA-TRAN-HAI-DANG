@@ -74,7 +74,7 @@
                     <c:choose>
                         <c:when test="${not empty amenityList}">
                             <c:forEach var="t" items="${amenityList}">
-                                <c:set var="isHoatDong" value="${'HoatDong'.equalsIgnoreCase(t.trangThaiHoatDong)}" />
+                                <c:set var="isHoatDong" value="${t.trangThaiHoatDong == 'HoatDong' || t.trangThaiHoatDong == 'hoatdong'}" />
                                 <div class="col-md-4">
                                     <div class="amenity-card p-3 ${!isHoatDong ? 'disabled-card' : ''}">
                                         <div>

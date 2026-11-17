@@ -21,8 +21,16 @@ import java.util.Set;
 @WebServlet("/banquanly/can-ho/cap-nhat")
 public class BQLCanHoUpdateServlet extends HttpServlet {
 
-    private final CanHoDAO canHoDAO = new CanHoDAO();
-    private static final Set<String> TRANG_THAI_HOP_LE = Set.of("DangO", "TrongChoThue", "BaoTri");
+	private final CanHoDAO canHoDAO;
+	private static final Set<String> TRANG_THAI_HOP_LE = Set.of("DangO", "TrongChoThue", "BaoTri");
+
+	public BQLCanHoUpdateServlet() {
+	    this.canHoDAO = new CanHoDAO();
+	}
+
+	BQLCanHoUpdateServlet(CanHoDAO canHoDAO) {
+	    this.canHoDAO = canHoDAO;
+	}
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {

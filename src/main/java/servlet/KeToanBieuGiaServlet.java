@@ -20,7 +20,15 @@ import java.util.Map;
 @WebServlet({"/ketoan/bieu-gia", "/ketoan/bieu-gia/them", "/ketoan/bieu-gia/sua", "/ketoan/bieu-gia/xoa"})
 public class KeToanBieuGiaServlet extends HttpServlet {
 
-    private final BieuGiaDichVuDAO bieuGiaDAO = new BieuGiaDichVuDAO();
+	private final BieuGiaDichVuDAO bieuGiaDAO;
+
+	public KeToanBieuGiaServlet() {
+	    this.bieuGiaDAO = new BieuGiaDichVuDAO();
+	}
+
+	KeToanBieuGiaServlet(BieuGiaDichVuDAO bieuGiaDAO) {
+	    this.bieuGiaDAO = bieuGiaDAO;
+	}
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
