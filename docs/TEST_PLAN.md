@@ -1,19 +1,30 @@
-# KẾ HOẠCH KIỂM THỬ (TEST PLAN)
+# KẾ HOẠCH KIỂM THỬ (TEST PLAN) - HỆ THỐNG QUẢN LÝ CHUNG CƯ
 
-* **Dự án:** [Tên dự án Web cá nhân]
-* **Sinh viên:** [Họ và tên - MSSV]
+## 1. Mục tiêu kiểm thử
+* Đảm bảo các chức năng cốt lõi của hệ thống hoạt động đúng theo đặc tả `SPECIFICATIONS.md`.
+* Phát hiện sớm các lỗi liên quan đến ràng buộc dữ liệu (Validation), phân quyền truy cập (Authentication/Authorization) và tính toán hóa đơn.
 
----
+## 2. Phạm vi kiểm thử (Scope)
+* **Trong phạm vi (In-Scope):**
+  * Chức năng Đăng nhập / Đăng xuất / Phân quyền.
+  * Chức năng CRUD (Thêm, Xem, Sửa, Xóa) Căn hộ.
+  * Chức năng Quản lý Cư dân.
+  * Chức năng Lập và thanh toán Hóa đơn dịch vụ.
+* **Ngoài phạm vi (Out-of-Scope):**
+  * Kiểm thử chịu tải (Load Testing) với hàng nghìn người dùng đồng thời.
+  * Tích hợp cổng thanh toán trực tuyến bên thứ ba (VNPay, Momo).
 
-## 1. MỤC TIÊU KIỂM THỬ
-* Kiểm thử logic backend (Unit Test với JUnit 5 cho Controller).
-* Kiểm thử giao diện tự động (Automation UI Test với Selenium WebDriver).
-* Tích hợp kiểm thử tự động với GitHub Actions CI/CD.
+## 3. Chiến lược & Loại hình kiểm thử
+* **Kiểm thử chức năng (Functional Testing):** Kiểm tra luồng nghiệp vụ chính (Happy Path) và các trường hợp ngoại lệ (Negative Path).
+* **Kiểm thử giao diện (UI Testing):** Đảm bảo hiển thị đúng bố cục, thông báo lỗi rõ ràng trên trình duyệt (Chrome/Edge).
+* **Kiểm thử bảo mật cơ bản:** Đảm bảo Cư dân không thể truy cập trực tiếp vào các URL quản trị của Admin thông qua thanh địa chỉ.
 
-## 2. PHẠM VI KIỂM THỬ
-* **In-Scope:** Luồng Đăng ký, Đăng nhập, và thao tác CRUD trên giao diện.
-* **Out-of-Scope:** Kiểm thử hiệu năng (Performance Test), Bảo mật chuyên sâu.
+## 4. Môi trường kiểm thử (Test Environment)
+* **Hệ điều hành:** Windows 10/11
+* **Trình duyệt:** Google Chrome / Microsoft Edge (phiên bản mới nhất)
+* **Web Server:** Apache Tomcat 11 (`http://localhost:8080/chungcu_war/`)
+* **Cơ sở dữ liệu:** Microsoft SQL Server (Database: `QLCCNew2`)
 
-## 3. TIÊU CHÍ HOÀN THÀNH
-* 100% test script thực thi pass.
-* Pipeline GitHub Actions báo xanh (Success).
+## 5. Tiêu chí nghiệm thu (Exit Criteria)
+* 100% các Test Case mức độ ưu tiên Cao (High) phải đạt trạng thái **Pass**.
+* Không còn lỗi nghiêm trọng (Critical/Blocker) làm sập ứng dụng (lỗi HTTP 500).
